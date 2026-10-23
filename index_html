@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Interaktif - MTs DDI Kelurahan Baru</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header / Navbar -->
+    <header class="bg-brand-800 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="showScreen('welcome-screen')">
+                <div class="bg-white p-2 rounded-lg text-brand-800 font-bold text-xl shadow">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight">MTs DDI Kelurahan Baru</h1>
+                    <p class="text-xs text-brand-100">Portal Quiz Interaktif</p>
+                </div>
+            </div>
+            
+            <!-- Admin Toggle Button -->
+            <button id="admin-toggle-btn" onclick="openAdminAuthModal()" class="bg-brand-700 hover:bg-brand-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center space-x-2 border border-brand-600">
+                <i class="fa-solid fa-user-shield"></i>
+                <span>Admin</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-4xl w-full mx-auto p-4 md:p-6">
+
+        <!-- 1. DASHBOARD / WELCOME SCREEN -->
+        <section id="welcome-screen" class="bg-white rounded-2xl shadow-xl p-6 md:p-10 text-center border border-slate-100">
+            <div class="w-24 h-24 bg-brand-50 text-brand-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
+                <i class="fa-solid fa-laptop-code text-4xl"></i>
+            </div>
+            
+            <h2 class="text-2xl md:text-3xl font-extrabold text-slate-800 mb-3">
+                Selamat Datang di Quiz Interaktif<br>
+                <span class="text-brand-700">MTs DDI Kelurahan Baru</span>
+            </h2>
+            <p class="text-slate-500 max-w-md mx-auto mb-8 text-sm md:text-base">
+                Uji pengetahuan dan kemampuan dasar coding Anda. Jawab seluruh pertanyaan dengan teliti dan raih nilai terbaik!
+            </p>
+
+            <form id="start-form" onsubmit="handleStartQuiz(event)" class="max-w-md mx-auto text-left space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Nama Lengkap Siswa</label>
+                    <input type="text" id="student-name" required placeholder="Masukkan nama Anda..." class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Kelas</label>
+                    <select id="student-class" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition bg-white">
+                        <option value="">-- Pilih Kelas --</option>
+                        <option value="VII A">VII A</option>
+                        <option value="VII B">VII B</option>
+                        <option value="VIII A">VIII A</option>
+                        <option value="VIII B">VIII B</option>
+                        <option value="IX A">IX A</option>
+                        <option value="IX B">IX B</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-lg shadow-lg hover:shadow-xl transition transform active:scale-[0.99] flex items-center justify-center space-x-2">
+                    <span>Mulai Pengerjaan Quiz</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </form>
+        </section>
+
+        <!-- 2. QUIZ SCREEN -->
+        <section id="quiz-screen" class="hidden space-y-6">
+            <!-- Student Header Banner -->
+            <div class="bg-white p-4 rounded-xl shadow border border-slate-100 flex justify-between items-center">
+                <div>
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Peserta</span>
+                    <span id="quiz-student-info" class="font-bold text-slate-700">Ahmad - Kelas VII A</span>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Progress</span>
+                    <span id="quiz-progress-text" class="font-bold text-brand-700">Soal 1 dari 5</span>
+                </div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-slate-100">
+                <div class="flex items-center space-x-3 mb-4">
+                    <span id="question-number-badge" class="bg-brand-100 text-brand-800 text-sm font-bold px-3 py-1 rounded-full">
+                        Soal #1
+                    </span>
+                </div>
+                <h3 id="question-text" class="text-lg md:text-xl font-bold text-slate-800 mb-6 leading-relaxed">
+                    -- Pertanyaan akan muncul di sini --
+                </h3>
+
+                <!-- Options List -->
+                <div id="options-container" class="space-y-3">
+                    <!-- Dynamic Options HTML inserted here -->
+                </div>
+            </div>
+
+            <!-- Navigation Controls -->
+            <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow border border-slate-100">
+                <button id="prev-btn" onclick="navigateQuestion(-1)" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i class="fa-solid fa-arrow-left mr-2"></i>Sebelumnya
+                </button>
+
+                <!-- Quick Number Map Dropdown -->
+                <div class="flex items-center space-x-2">
+                    <span class="text-xs text-slate-500 hidden md:inline">Navigasi:</span>
+                    <div id="number-map" class="flex space-x-1">
+                        <!-- Number buttons inserted here -->
+                    </div>
+                </div>
+
+                <button id="next-btn" onclick="navigateQuestion(1)" class="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-lg shadow transition">
+                    Berikutnya <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- 3. RESULT SCREEN -->
+        <section id="result-screen" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl shadow-xl p-6 md:p-10 text-center border border-slate-100">
+                <div id="score-badge-icon" class="w-20 h-20 bg-brand-100 text-brand-700 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                
+                <h2 class="text-2xl font-bold text-slate-800 mb-1">Hasil Quiz Anda</h2>
+                <p id="result-student-detail" class="text-slate-500 text-sm mb-6">Siswa: - | Kelas: -</p>
+
+                <!-- Score Box -->
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 max-w-sm mx-auto mb-8 shadow-inner">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest block mb-1">NILAI AKHIR</span>
+                    <div id="final-score" class="text-5xl font-extrabold text-brand-700 mb-2">0</div>
+                    <p id="score-message" class="text-sm font-medium text-slate-600">--</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 max-w-sm mx-auto mb-8">
+                    <div class="bg-emerald-50 border border-emerald-100 p-3 rounded-xl">
+                        <span class="text-xs text-emerald-600 font-bold block">Jawaban Benar</span>
+                        <span id="correct-count" class="text-xl font-bold text-emerald-700">0</span>
+                    </div>
+                    <div class="bg-rose-50 border border-rose-100 p-3 rounded-xl">
+                        <span class="text-xs text-rose-600 font-bold block">Jawaban Salah</span>
+                        <span id="wrong-count" class="text-xl font-bold text-rose-700">0</span>
+                    </div>
+                </div>
+
+                <div class="flex justify-center space-x-4">
+                    <button onclick="resetAndHome()" class="px-6 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-lg transition">
+                        <i class="fa-solid fa-house mr-2"></i>Kembali ke Beranda
+                    </button>
+                    <button onclick="toggleReviewSection()" class="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-lg shadow transition">
+                        <i class="fa-solid fa-list-check mr-2"></i>Lihat Pembahasan
+                    </button>
+                </div>
+            </div>
+
+            <!-- Review / Pembahasan Section (Hidden by default) -->
+            <div id="review-section" class="hidden bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-slate-100">
+                <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center border-b pb-3">
+                    <i class="fa-solid fa-square-poll-vertical text-brand-600 mr-2"></i> Evaluasi & Pembahasan Jawaban
+                </h3>
+                <div id="review-container" class="space-y-6">
+                    <!-- Dynamic review items generated here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. ADMIN DASHBOARD SCREEN -->
+        <section id="admin-screen" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-100 flex flex-col md:flex-row justify-between md:items-center gap-4">
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span class="bg-rose-100 text-rose-700 text-xs font-bold px-2.5 py-1 rounded-full uppercase">Mode Admin</span>
+                        <h2 class="text-xl font-bold text-slate-800">Manajemen Kelola Quiz</h2>
+                    </div>
+                    <p class="text-sm text-slate-500 mt-1">Tambah, edit urutan, atau hapus pertanyaan quiz interaktif.</p>
+                </div>
+                
+                <div class="flex space-x-2">
+                    <button onclick="openAddQuestionModal()" class="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow transition flex items-center space-x-2">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Tambah Soal</span>
+                    </button>
+                    <button onclick="exitAdmin()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm font-bold transition">
+                        Keluar Admin
+                    </button>
+                </div>
+            </div>
+
+            <!-- Questions List in Admin -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 border border-slate-100">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-slate-800">Daftar Soal Saat Ini (<span id="admin-question-count">5</span>)</h3>
+                    <button onclick="restoreDefaultQuestions()" class="text-xs text-brand-600 hover:underline font-semibold">
+                        <i class="fa-solid fa-rotate-left mr-1"></i>Reset ke Soal Default
+                    </button>
+                </div>
+
+                <div id="admin-questions-list" class="space-y-4">
+                    <!-- Dynamic Admin Questions List -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-800 text-slate-400 py-4 text-center text-xs mt-auto">
+        <p>&copy; MTs DDI Kelurahan Baru - Sistem Quiz Interaktif Pemrograman</p>
+    </footer>
+
+    <!-- MODAL 1: Admin Password Authentication -->
+    <div id="admin-auth-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 border border-slate-100">
+            <h3 class="text-lg font-bold text-slate-800 mb-2 flex items-center">
+                <i class="fa-solid fa-lock text-brand-600 mr-2"></i> Akses Admin
+            </h3>
+            <p class="text-xs text-slate-500 mb-4">Masukkan PIN/Sandi Admin untuk mengelola soal kuis.</p>
+            
+            <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+                <div>
+                    <input type="password" id="admin-pass-input" placeholder="Sandi admin (default: admin123)" required class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none text-sm">
+                </div>
+                <div id="admin-auth-error" class="text-xs text-rose-500 hidden font-semibold">
+                    Kata sandi salah! Coba `admin123`.
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" onclick="closeAdminAuthModal()" class="px-4 py-2 text-slate-600 hover:
